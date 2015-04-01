@@ -129,6 +129,7 @@ def get_date(file_path):
 
 def run_stdev_finder():
     '''
+    !!!No longer relevant but I'll keep it here for nostalgia's sake!!!
     This is a runner function that goes through each .bsq five band file and creates comparison files for each other
     .bsq five band file of a later date. Puts the conditional comparisons into a folder in the current working directory
     called "stdev_outs".
@@ -152,6 +153,7 @@ def run_stdev_finder():
 
 def run_196stdev_finder():
     '''
+    !!!No longer relevant but I'll keep it here for nostalgia's sake!!!
     Runs the 1.96 standard deviation finder in the same manner as the run_stdev_finder function.
     :return:
     '''

@@ -50,7 +50,7 @@ def custom_nodata(rlist):
     # Conditional sets new raster values to zero if equal to above values and not within previous conditional scope
     new_raster = Con(new_raster == 1, Con(((rlist[0] == val_1) & (rlist[1] == val_2) & (rlist[2] == val_3) & (rlist[3] == val_4) & (rlist[4] == val_5)), 0, 1), new_raster)
 
-    # Set zero to null in new raster. Only have data where there is meaningful data in original.
+    # Set zero to null in new raster. Only retain data where there is meaningful data in original.
     new_raster = SetNull(new_raster == 0, new_raster)
 
     return new_raster
@@ -64,6 +64,18 @@ def raster_to_polygon(raster_path, output_path):
     :return:
     '''
     raster = Raster(raster_path)
+    mask_raster = Con((raster == 0) | (raster == 1), 1, 0)
+    arcpy.RasterToPolygon_conversion(mask_raster, output_path, "NO_SIMPLIFY")
+    return
+
+def raster_obj_to_polygon(raster_obj, output_path):
+    '''
+    Creates a polygon footprint of a binary (1 or 0) raster.
+    :param raster_path: The path to the raster you want to turn into a polygon
+    :param output_path: The path to where you want the output to go.
+    :return:
+    '''
+    raster = raster_obj
     mask_raster = Con((raster == 0) | (raster == 1), 1, 0)
     arcpy.RasterToPolygon_conversion(mask_raster, output_path, "NO_SIMPLIFY")
     return
