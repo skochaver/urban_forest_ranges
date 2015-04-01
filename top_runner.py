@@ -21,7 +21,7 @@ def get_files_of_ext(directory, extension):
 
 def create_path_footprints(image_directory, burn_raster_path):
     '''
-    Given a directory containing .bsq images and a path to an 0 constant raster this function will add 1 to every raster
+    Given a directory containing .tif images and a path to an 0 constant raster this function will add 1 to every raster
     pixel where there is meaningful data in the raster. Converts to shapefile in directory and burns based on the
     output polygon geometry. Puts those shapefiles into a temporary directory then removes the directory.
     :param image_directory: The directory containing the raster images
@@ -114,8 +114,10 @@ def _196stdev_analysis(image_directory, template_raster_path, int_count_raster):
     per_calc.save(per_raster_path)
     return
 
+intersection_path = r"C:\_sword_analysis\3-27-15\N\stdev_outs"
 n_path = r"C:\_sword_analysis\3-27-15\N"
+burn_raster = r"C:\_sword_analysis\3-27-15\empty_raster.tif"
 intersection_count_raster = r"C:\_sword_analysis\3-27-15\path_intersection_count.tif"
 template_raster_path = r"C:\_sword_analysis\3-27-15\empty_raster.tif"
 
-_196stdev_analysis(n_path, template_raster_path, intersection_count_raster)
+_196stdev_analysis(n_path, burn_raster, intersection_count_raster)

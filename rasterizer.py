@@ -87,6 +87,7 @@ def create_out_tiff(in_file, out_file, initial_shp):
 
     gdal.RasterizeLayer(out_source, [1], layer, burn_values=[0], options=['ALL_TOUCHED=TRUE'])
 
+
     in_source = None
     out_source = None
     vector_source = None
