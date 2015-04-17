@@ -1,6 +1,6 @@
 from raster_clipper import *
 from stdev_rangefinder import get_date, check_stdev_range, check_196stdev_range
-from raster_adder import add_small_rasters
+from raster_adder import add_small_rasters, total_intersection
 import arcpy
 from rasterizer import add_to_raster
 from arcpy.sa import *
@@ -46,7 +46,7 @@ def create_path_footprints(image_directory, burn_raster_path):
     return
 
 
-def stdev_analysis(image_directory, template_raster_path, int_count_raster):
+def stdev_analysis(image_directory, template_raster_path, int_count_raster, type):
     '''
     Does the standard deviation analysis for the .bsq images in the given image directory. Creates a directory of
     all the analysis outputs in said directory then creates a count raster of all those outputs.
@@ -68,19 +68,19 @@ def stdev_analysis(image_directory, template_raster_path, int_count_raster):
             print '\t' + compare_file
             output_path = os.path.join(os.getcwd(), stdev_dir, get_date(raster_file) + '_TO_' + get_date(compare_file) + '.tif')
             try:
-                check_stdev_range(raster_file, compare_file, output_path)
+                check_stdev_range(raster_file, compare_file, output_path, template_raster_path)
             except:
                 pass
 
-    true_count_path = os.path.join(stdev_dir, 'stdev_true_count.tif')
+    true_count_path = os.path.join(stdev_dir, type+'_stdev_true_count.tif')
     add_small_rasters(stdev_dir, template_raster_path, true_count_path)
 
-    per_raster_path = os.path.join(stdev_dir, 'stdev_percent.tif')
+    per_raster_path = os.path.join(stdev_dir, type+'_stdev_percent.tif')
     per_calc = Raster(true_count_path) * 1.0 / Raster(int_count_raster) * 1.0
     per_calc.save(per_raster_path)
     return
 
-def _196stdev_analysis(image_directory, template_raster_path, int_count_raster):
+def _196stdev_analysis(image_directory, template_raster_path, int_count_raster, type):
     '''
     Does the standard deviation analysis for the .bsq images in the given image directory. Creates a directory of
     all the analysis outputs in said directory then creates a count raster of all those outputs.
@@ -106,18 +106,28 @@ def _196stdev_analysis(image_directory, template_raster_path, int_count_raster):
             except:
                 pass
 
-    true_count_path = os.path.join(stdev_dir, '196stdev_true_count.tif')
+    true_count_path = os.path.join(stdev_dir, type+'_196stdev_true_count.tif')
     add_small_rasters(stdev_dir, template_raster_path, true_count_path)
 
-    per_raster_path = os.path.join(stdev_dir, '196stdev_percent.tif')
+    per_raster_path = os.path.join(stdev_dir, type+'_196stdev_percent.tif')
     per_calc = Raster(true_count_path) * 1.0 / Raster(int_count_raster) * 1.0
     per_calc.save(per_raster_path)
     return
 
-intersection_path = r"C:\_sword_analysis\3-27-15\N\stdev_outs"
-n_path = r"C:\_sword_analysis\3-27-15\N"
-burn_raster = r"C:\_sword_analysis\3-27-15\empty_raster.tif"
-intersection_count_raster = r"C:\_sword_analysis\3-27-15\path_intersection_count.tif"
-template_raster_path = r"C:\_sword_analysis\3-27-15\empty_raster.tif"
+n_path = r"C:\_sword_analysis\4-14-15\Resampled_AVG\N"
+lma_path = r"C:\_sword_analysis\4-14-15\Resampled_AVG\LMA"
+lig_path = r"C:\_sword_analysis\4-14-15\Resampled_AVG\LIG"
 
-_196stdev_analysis(n_path, burn_raster, intersection_count_raster)
+path_count = r"C:\_sword_analysis\4-14-15\Resampled_AVG\path_counts.tif"
+template_raster_path = r"C:\_sword_analysis\4-8-15\empty_raster.tif"
+
+# total_intersection(n_path, template_raster_path, path_count)
+
+# stdev_analysis(n_path, template_raster_path, path_count, 'n')
+# _196stdev_analysis(n_path, template_raster_path, path_count, 'n')
+
+# stdev_analysis(lma_path, template_raster_path, path_count, 'lma')
+_196stdev_analysis(lma_path, template_raster_path, path_count, 'lma')
+
+stdev_analysis(lig_path, template_raster_path, path_count, 'lig')
+_196stdev_analysis(lig_path, template_raster_path, path_count, 'lig')

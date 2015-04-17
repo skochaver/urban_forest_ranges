@@ -44,7 +44,7 @@ def raster_intersection(raster_1_path, raster_2_path):
 
     return ext_poly, pmemory
 
-def check_stdev_range(raster_1_path, raster_2_path, con_raster_path):
+def check_stdev_range(raster_1_path, raster_2_path, con_raster_path, template_raster_path):
     '''
     A custom conditional function that creates a binary raster from two five band rasters. Assumes the third band is
     the mean of the data, and the 2nd and 4th bands are the maximum and minimum of a single standard deviation respectively.
@@ -56,6 +56,7 @@ def check_stdev_range(raster_1_path, raster_2_path, con_raster_path):
     :return:
     '''
     bound_poly, pmemory = raster_intersection(raster_1_path, raster_2_path)
+    env.snapRaster = template_raster_path
 
     band_list_1 = raster_clipper.get_band_list(raster_1_path)
     rlist1 = raster_clipper.bands_to_raster_obj(raster_1_path, band_list_1)

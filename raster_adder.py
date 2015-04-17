@@ -1,10 +1,11 @@
 import os
 import arcpy
+from stdev_rangefinder import get_date, check_stdev_range
 from arcpy.sa import *
 from arcpy import env
 import tempfile
 import shutil
-
+import time
 arcpy.CheckOutExtension("Spatial")
 env.overwriteOutput = True
 __author__ = 'Steve Kochaver'
@@ -27,7 +28,7 @@ def make_it_big(small_raster_path, big_raster_path):
     temp_raster = name + '-temp' + ext
 
     arcpy.CopyRaster_management(small_raster_path, temp_raster)
-    big_raster =Raster(temp_raster)
+    big_raster = Raster(temp_raster)
     # Gives null value pixels a value of 0 for the purposes of adding to other rasters of the same (new) extent.
     # Saves it in the in-memory raster object and also as a new variable if it needs to be saved somewhere else.
     new_raster = Con(IsNull(temp_raster), 0, temp_raster)
@@ -56,5 +57,35 @@ def add_small_rasters(small_directory, template_raster_path, final_raster_path):
 
     template_raster.save(final_raster_path)
     shutil.rmtree(temp_dir)
+    return
+
+def total_intersection(in_raster_dir, template_raster_path, final_raster_path):
+
+    temp_dir_1 = tempfile.mkdtemp()
+    temp_dir_2 = tempfile.mkdtemp()
+
+    meaningful_files = get_files_of_ext(in_raster_dir, '.bsq')
+    remaining_files = meaningful_files[:]
+
+    for raster_file in meaningful_files:
+        remaining_files.remove(raster_file)
+        for compare_file in remaining_files:
+            output_path = os.path.join(temp_dir_1, get_date(raster_file) + '_TO_' + get_date(compare_file) + '.tif')
+            try:
+                check_stdev_range(raster_file, compare_file, output_path, template_raster_path)
+            except:
+                pass
+
+    for image in get_files_of_ext(temp_dir_1, '.tif'):
+        image_name = os.path.basename(image)
+        my_raster = Raster(image)
+        con_raster = Con(((my_raster == 1) | (my_raster == 0)), 1, 0)
+        con_raster.save(os.path.join(temp_dir_2, image_name))
+        con_raster = None
+        my_raster = None
+
+    add_small_rasters(temp_dir_2, template_raster_path, final_raster_path)
+    shutil.rmtree(temp_dir_1)
+    shutil.rmtree(temp_dir_2)
     return
 
